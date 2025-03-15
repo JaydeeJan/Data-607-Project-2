@@ -1,0 +1,109 @@
+---
+title: "Data 607 Project 2"
+author: "Jayden Jiang"
+date: "2025-03-10"
+output: html_document
+---
+
+# Library
+```{r}
+library(tidyr)
+library(dplyr)
+```
+
+# Load Dataset #1
+```{r}
+dataset1 <- read.csv("https://raw.githubusercontent.com/JaydeeJan/Data-607-Project-2/refs/heads/main/products%20across%20different%20regions.csv")
+
+print(dataset1)
+```
+
+# Tidy and Transform the Data
+```{r}
+# converting the data from wide format to long format for easier analysis
+long_data1 <- dataset1 %>%
+  pivot_longer(cols = starts_with("Jan") :starts_with("Jun"),
+               names_to = "Month",
+               values_to = "Sales")
+
+head(long_data1)
+```
+
+# Analysis
+```{r}
+# calculating total sales per product and per region
+total_sales_product <- long_data1 %>%
+  group_by(Product.Name) %>%
+  summarise(Total_Sales = sum(Sales))
+
+total_sales_region <- long_data1 %>%
+  group_by(Region) %>%
+  summarise(Total_Sales = sum(Sales))
+
+print(total_sales_product)
+
+print(total_sales_region)
+```
+
+# Conclusion
+The analysis shows the total sales for each product and region. Product B has the highest total sales, and the East region has the highest total sales across all products.
+
+# Load Dataset #2
+```{r}
+dataset2 <- read.csv("https://raw.githubusercontent.com/JaydeeJan/Data-607-Project-2/refs/heads/main/rolling_stone.csv")
+
+head(dataset2)
+```
+# Tidy and Transform the Data
+```{r}
+dataset2 <- dataset2 %>%
+  select(album, rank_2003, rank_2012, rank_2020)
+
+long_data2 <- dataset2 %>%
+  pivot_longer(
+    cols = starts_with("rank_"),
+    names_to = "Rank_Year",
+    values_to = "Rank")
+
+head(long_data2)
+```
+# Analysis
+```{r}
+# Calculate the average ranking for each album
+average_ranking <- long_data2 %>%
+  group_by(album) %>%
+  summarise(average_rank = mean(Rank, na.rm = TRUE)) %>%
+  arrange(average_rank)
+
+head(average_ranking, 10)
+```
+# Conclusion
+The analysis shows the top 10 albums for average ranking over 2003, 2012, and 2020. 
+
+# Load Dataset #3
+```{r}
+dataset3 <- read.csv("https://raw.githubusercontent.com/JaydeeJan/Data-607-Project-2/refs/heads/main/Sales%20Data.csv")
+
+head(dataset3)
+```
+
+# Tidy and Transform the Data
+```{r}
+long_data3 <- dataset3 %>%
+  pivot_longer(cols = January:November, names_to = "Month", values_to = "Sales") %>%
+  mutate(Sales = as.numeric(gsub("[\\$,]", "", Sales)))
+
+head(long_data3)
+```
+# Analysis
+```{r}
+# Calculate total sales per store
+total_sales_per_store <- long_data3 %>%
+  group_by(Store) %>%
+  summarise(Total_Sales = sum(Sales)) %>%
+  arrange(desc(Total_Sales))
+
+print(total_sales_per_store)
+```
+# Conclusion
+The analysis shows the 5 stores in US market has the highest total sales amount comparing to other regions. 
